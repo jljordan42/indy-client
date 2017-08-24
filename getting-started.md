@@ -77,12 +77,12 @@ The CLI could play the role of multiple **identity owners** (a person like Alice
 sovrin> prompt ALICE
 ALICE>
 ```
-Next, we will create a new empty keyring for Alice. Creating a new empty keyring basically resets the agent to a clean slate. Because this is the first time you're setting this up, this step is not actually necessary. If you're wanting to do interact with other identifiers held by the agent then this does become necessary.
+Next, we will create a new empty keyring for Alice. Creating a new empty keyring basically resets the agent to a clean slate. Because this is the first time you're setting this up, this step is not actually necessary. If you're wanting to do interaction with other identifiers held by the agent then this does become necessary.
 
 It's a good habit to get into. Go ahead and create the new keyring now:
 
 ```
-new keyring Alice
+new wallet Alice
 ```
 
 
