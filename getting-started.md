@@ -77,7 +77,7 @@ The CLI could play the role of multiple **identity owners** (a person like Alice
 sovrin> prompt ALICE
 ALICE>
 ```
-Next, we will create a new empty keyring for Alice. Creating a new empty keyring basically resets the agent to a clean slate. Because this is the first time you're setting this up, this step is not actually necessary. If you're wanting to do interact with other identifiers held by the agent then this does become necessary.
+Next, we will create a new empty wallet for Alice. Creating a new empty wallet basically resets the agent to a clean slate. Because this is the first time you're setting this up, this step is not actually necessary. If you're wanting to do interact with other identifiers held by the agent then this does become necessary.
 
 It's a good habit to get into. Go ahead and create the new keyring now:
 
@@ -99,10 +99,10 @@ Alice might also try the 'help' command to see a list of the other commands that
 
 ## Evaluate an Invitation
 
-To make this guide more convenient, the sovrin CLI package installs a sample Faber College invitation in a file at /<CLI_ROOT>/sample/faber-invitation.sovrin. We’re going to use this file as if it had been downloaded from Faber. (In normal usage, Alice’s Sovrin app would be doing a lot of these steps automatically.)
+To make this guide more convenient, the sovrin CLI package installs a sample Faber College invitation in a file at /<CLI_ROOT>/sample/faber-request.sovrin. We’re going to use this file as if it had been downloaded from Faber. (In normal usage, Alice’s Sovrin app would be doing a lot of these steps automatically.)
 
 ```
-ALICE> show sample/faber-invitation.sovrin
+ALICE> show sample/faber-request.sovrin
 {
   "link-invitation": {
     "name": "Faber College",
@@ -113,64 +113,63 @@ ALICE> show sample/faber-invitation.sovrin
 }
 
 Try Next:
-    load sample/faber-invitation.sovrin
+    load sample/faber-request.sovrin
 ```
 
 Alice sees a bunch of data that looks interesting but mysterious. She wants Sovrin to tell her if the link invitation file is well formed and has something useful in it, so she uses the 'load' command:
 
 ```
-ALICE> load sample/faber-invitation.sovrin
-New keyring Default created
-Active keyring set to "Default"
-1 link invitation found for Faber College.
-Creating Link for Faber College.
+ALICE> load sample/faber-request.sovrin
+1 connection request found for Faber College.
+Creating connection for Faber College.
 
 Try Next:
-    show link "Faber College"
-    accept invitation from "Faber College"
+    show connection "Faber College"
+    accept request from "Faber College"
 ```
 
-This causes the client to parse and validate the file in addition to displaying more reader friendly text. Alice would now like to know what’s entailed in accepting the invitation.  She types:
+This causes the client to parse and validate the file in addition to displaying more reader friendly text. Alice would now like to know what’s entailed in accepting the request.  She types:
 
 ```
-ALICE> show link Faber
+ALICE> show connection Faber
 ```
 
 Unlike the 'show' command for files, this one asks Sovrin to show a link. More details are exposed:
 
 ```
-Expanding Faber to "Faber College"
-Link (not yet accepted)
-    Name: Faber College
-    Identifier: not yet assigned
-    Trust anchor: Faber College (not yet written to Sovrin)
-    Verification key: <empty>
-    Signing key: <hidden>
-    Target: FuN98eH2eZybECWkofW6A9BKJxxnTatBCopfUiNxo6ZB
-    Target Verification key: <unknown, waiting for sync>
-    Target endpoint: <unknown, waiting for sync>
-    Invitation nonce: b1134a647eb818069c089e7694f63e6d
-    Invitation status: not verified, target verkey unknown
-    Last synced: <this link has not yet been synchronized>
 
-Try Next:
-    sync "Faber College"
-    accept invitation from "Faber College"
 ```
 
 You’ll see the link contains several pieces of information. Let’s examine them one at a time.
 
 ```
-Name: Faber College
+Expanding Faber to "Faber College"
+Connection (not yet accepted)
+    Name: Faber College
+    DID: not yet assigned
+    Trust anchor: Faber College (not yet written to Sovrin)
+    Verification key: <empty>
+    Signing key: <hidden>
+    Remote: ULtgFQJe6bjiFbs7ke3NJD
+    Remote Verification key: <unknown, waiting for sync>
+    Remote endpoint: <unknown, waiting for sync>
+    Request nonce: b1134a647eb818069c089e7694f63e6d
+    Request status: not verified, remote verkey unknown
+    Last synced: <this connection has not yet been synchronized>
+
+Try Next:
+    sync "Faber College"
+    accept request from "Faber College"
+
 ```
 
 This is a friendly name for the link that Alice has been invited to accept. The name is stored locally and not shared. Alice can always rename a link; its initial value is just provided by Faber for convenience.
 
 ```
-Identifier: not yet assigned
+DID: not yet assigned
 ```
 
-**Identifier** is a unique value that gets generated when user tries to accept the invitation, and that identifier will be sent to Faber College, and used by Faber College to reference Alice in secure interactions. Each link invitation on Sovrin establishes a **pairwise relationship** when accepted. A pairwise relationship is a unique relationship between two identity owners (e.g., Faber and Alice). The relationship between them is not shareable with others; it is unique to those two parties in that each pairwise relationship uses different identifiers. (In other circles you may see this defined as two sets of data working in conjunction with each other to perform a specific function, such as in a "public" key and a "private" key working together. This is _not_ how it is defined within Sovrin.) Alice won’t use this identifier with other relationships. By having independent pairwise relationships, Alice reduces the ability for others to correlate her activities across multiple interactions.
+**DID** is a unique value that gets generated when user tries to accept the request, and that DID (distributed identifier) will be sent to Faber College, and used by Faber College to reference Alice in secure interactions. Each connection request on Sovrin establishes a **pairwise relationship** when accepted. A pairwise relationship is a unique relationship between two identity owners (e.g., Faber and Alice). The relationship between them is not shareable with others; it is unique to those two parties in that each pairwise relationship uses different DIDs (distributed identifiers). (In other circles you may see this defined as two sets of data working in conjunction with each other to perform a specific function, such as in a "public" key and a "private" key working together. This is _not_ how it is defined within Sovrin.) Alice won’t use this identifier with other relationships. By having independent pairwise relationships, Alice reduces the ability for others to correlate her activities across multiple interactions.
 
 ```
 Trust anchor: Faber College(not yet written to Sovrin)
@@ -180,7 +179,7 @@ This gives Alice a friendly name for the entity that will bootstrap the new pair
 
 It is important to understand that this identifier for Alice is not, in and of itself, the same thing as Alice’s self-sovereign identity. Rather, Alice’s identity will -- for her -- be the sum total of **_all_** of the pairwise relationships she has, and **_all_** the attributes knowable about those manifestations of her identity, across the full network.
 
-If Alice accepts this invitation, she will have a self-sovereign identity by virtue of the fact that she is accessible on the network through at least one relationship. In this case Faber College will be creating the first of many independent relationships that will participate in Alice’s overall identity--but Alice’s identity will not be captive to Faber College in any way.
+If Alice accepts this request, she will have a self-sovereign identity by virtue of the fact that she is accessible on the network through at least one relationship. In this case Faber College will be creating the first of many independent relationships that will participate in Alice’s overall identity--but Alice’s identity will not be captive to Faber College in any way.
 
 ```
 Verification key: <empty>
@@ -201,7 +200,7 @@ In this case, the creator of the Sovrin identity record (the trust anchor) contr
 
 In this guide, an Abbreviated key will be created and used by Alice (you'll notice the `~` prefix for the verification key later in the guide).
 
-The key that Alice uses to interact with Faber can change if she revokes or rotates it, so accepting this invitation and activating this link doesn’t lock Alice into permanent use of this key. [Key management events](https://en.wikipedia.org/wiki/Key_management) are discoverable in the Sovrin ledger by parties such as Faber College; we’ll touch on that later in the guide.
+The key that Alice uses to interact with Faber can change if she revokes or rotates it, so accepting this invitation and activating this connection doesn’t lock Alice into permanent use of this key. [Key management events](https://en.wikipedia.org/wiki/Key_management) are discoverable in the Sovrin ledger by parties such as Faber College; we’ll touch on that later in the guide.
 
 ```
 Signing key: < hidden >
@@ -212,55 +211,55 @@ A different **signing key** is used by Alice to interact with each party on Sovr
 It’s important that _this signing key is kept secret,_ as someone with this key can impersonate Alice. If this key is ever compromised, Alice can replace it with a new one using several methods not covered here.
 
 ```
-Target: FuN98eH2eZybECWkofW6A9BKJxxnTatBCopfUiNxo6ZB
+Remote: ULtgFQJe6bjiFbs7ke3NJD
 ```
 
-**Target** is the unique identifier Alice uses to reference Faber College. Faber College provided this value in the invitation. Alice can use it to look up Faber College’s verification key in the Sovrin Ledger to ensure interactions with Faber College are authentic.
+**Remote** is the unique identifier Alice uses to reference Faber College. Faber College provided this value in the invitation. Alice can use it to look up Faber College’s verification key in the Sovrin Ledger to ensure interactions with Faber College are authentic.
 
 ```
-Target Verification key: < unknown, waiting for sync >
+Remote Verification key: < unknown, waiting for sync >
 ```
 
 Communication from the target can’t be confirmed unless we know its verification key. We know the target is a **CID** (a cryptographic identifier, that’s what the Target line just above told us) --  but since key revocations and rotations might happen at any time, we cannot assume that a CID has not updated its verification key. To know the true verification key of an identifier, we have to query Sovrin.
 
 Different use cases require different levels of assurance as to how recently we’ve queried Sovrin for any key replacements. In this case we might be comfortable if we know that the key was synchronized in the last hour. But we can see that we’ve never synchronized this link, so we don’t know what the verification key is at all. Until Alice connects to Sovrin, she won’t be able to trust communication from Faber College.
 ```
-Target endpoint: < unknown, waiting for sync >
+Remote endpoint: < unknown, waiting for sync >
 ```
 
-Targets can have endpoints -- locations (IRIs / URIs / URLs) on the network where others can contact them. These endpoints can be static or they can be ephemeral pseudonymous endpoints facilitated by a third party agency. To keep things simple, we’ll just use static endpoints for now.
+Remotes can have endpoints -- locations (IRIs / URIs / URLs) on the network where others can contact them. These endpoints can be static or they can be ephemeral pseudonymous endpoints facilitated by a third party agency. To keep things simple, we’ll just use static endpoints for now.
 ```
-Invitation nonce: b1134a647eb818069c089e7694f63e6d
+Remote nonce: b1134a647eb818069c089e7694f63e6d
 ```
 
 This **nonce** is just a big random number that Faber College generated to track the unique invitation. A nonce is a random arbitrary number that can only be used one time. When an invitation is accepted, the invitee digitally signs the nonce such that the inviter can match the acceptance with a prior invitation.
 ```
-Invitation status: not verified, target verification key unknown
+Remote status: not verified, remote verkey unknown
 ```
 
-Invitations are signed by the target. We have a signature, but we don’t yet know Faber College’s verification key, so the signature can’t be proved authentic. We might have an invitation from someone masquerading as Faber College. We’ll resolve that uncertainty when we sync.
+Requests are signed by the remote. We have a signature, but we don’t yet know Faber College’s verification key, so the signature can’t be proved authentic. We might have an request from someone masquerading as Faber College. We’ll resolve that uncertainty when we sync.
 ```
-Last synced: < this link has not yet been synchronized >
+Last synced: < this connection has not yet been synchronized >
 ```
-A link stores when it was last synchronized with the Sovrin network, so we can tell how stale some of the information might be. Ultimately, values will be proved current when a transaction is committed to the ledger, so staleness isn’t dangerous -- but it makes Sovrin more efficient when identity owners work with up-to-date data.
+A connection stores when it was last synchronized with the Sovrin network, so we can tell how stale some of the information might be. Ultimately, values will be proved current when a transaction is committed to the ledger, so staleness isn’t dangerous -- but it makes Sovrin more efficient when identity owners work with up-to-date data.
 
 ## Accept the Invitation
 
 Alice _attempts_ to accept the invitation from Faber College.
 
 ```
-ALICE> accept invitation from Faber
+ALICE> accept request from Faber
 Expanding Faber to "Faber College"
-Invitation not yet verified.
-Link not yet synchronized.
-Invitation acceptance aborted.
+Request not yet verified.
+Connection not yet synchronized.
+Request acceptance aborted.
 Cannot sync because not connected. Please connect first.
 
 Usage:
     connect <test|live>
 ```
 
-In order to accept an invitation, its origin must be proved. Just because an invitation says the sender is "Faber College" doesn’t make it so; the ease of forging email headers is a reminder of why we can’t just trust what a sender says. Syncing the link with Sovrin will allow us to prove the association between Faber College’s identity and public key, but the CLI must be connected to the Sovrin network to sync -- and we haven’t connected yet.
+In order to accept a request, its origin must be proved. Just because a request says the sender is "Faber College" doesn’t make it so; the ease of forging email headers is a reminder of why we can’t just trust what a sender says. Syncing the connection with Sovrin will allow us to prove the association between Faber College’s identity and public key, but the CLI must be connected to the Sovrin network to sync -- and we haven’t connected yet.
 
 There are two Sovrin networks we might connect to. One is a test network, and the other is live (production). We’ll use the test network for the demo.
 
@@ -273,57 +272,57 @@ Connected to test.
 Alice tries again to accept the invitation from Faber College. This time she succeeds.
 
 ```
-ALICE@test> accept invitation from Faber
+ALICE@test> accept request from Faber
 Expanding Faber to "Faber College"
-Invitation not yet verified.
-Link not yet synchronized.
+Request not yet verified.
+Connection not yet synchronized.
 Attempting to sync...
-No key present in keyring for making request on Sovrin, so adding one
-Key created in keyring Default
-Identifier for key is E6HrMGPwGn4B3ASUu9xmWdAG1WqqpWPXtS9GU1BTXFmY
-Current identifier set to E6HrMGPwGn4B3ASUu9xmWdAG1WqqpWPXtS9GU1BTXFmY
+No key present in wallet for making request on Sovrin, so adding one
+Key created in wallet Alice
+DID for key is RJwaDDTycsNkXf3d6bjZ9d
+Verification key is ~5Ba3A59o8fscgf2uK2JjiS
+Current DID set to RJwaDDTycsNkXf3d6bjZ9d
 
 Synchronizing...
-    Link Faber College synced
-Accepting invitation with nonce b1134a647eb818069c089e7694f63e6d from id Qgjf1bJQumWtsPAswytB5V
-SGdY53 looking for Faber College at 10.20.30.101:5555
-SGdY53 pinged Faber College at HA(host='0.0.0.0', port=6001)
-SGdY53 got pong from Faber College
+    Connection Faber College synced
+    Connection Faber College synced
+Accepting request with nonce b1134a647eb818069c089e7694f63e6d from id ULtgFQJe6bjiFbs7ke3NJD
+CONNECTION: 1cbbe1 looking for Faber College at 10.0.0.6:5555
 
 Signature accepted.
 
-Response from Faber College (24.59 ms):
+Response from Faber College (8.46 ms):
     Trust established.
-    Identifier created in Sovrin.
+    DID created in Sovrin.
     Available Claim(s): Transcript
 
 Synchronizing...
-    Confirmed identifier written to Sovrin.
+    Confirmed DID written to Sovrin.
 
 Try Next:
     show claim "Transcript"
     request claim "Transcript"
 ```
-Accepting an invitation takes the nonce that Faber College provided, and signs it with the Alice’s signing key. It then securely transmits the signed data along with the identifier and verification key to Faber College’s endpoint, which is discovered when the link is synchronized. Faber College matches the provided nonce to the record of the nonce it sent to Alice, verifies the signature, then records Alice’s new pairwise identifier in the Sovrin ledger.
+Accepting a request takes the nonce that Faber College provided, and signs it with the Alice’s signing key. It then securely transmits the signed data along with the DID (distributed identifier) and verification key to Faber College’s endpoint, which is discovered when the connection is synchronized. Faber College matches the provided nonce to the record of the nonce it sent to Alice, verifies the signature, then records Alice’s new pairwise identifier in the Sovrin ledger.
 
-Once the link is accepted and synchronized, Alice inspects it again.
+Once the connection is accepted and synchronized, Alice inspects it again.
 
 ```
-ALICE@test> show link Faber
+ALICE@test> show connection Faber
 Expanding Faber to "Faber College"
-Link
+Connection
     Name: Faber College
-    Identifier: LZ46KqKd1VrNFjXuVFUSY9
+    DID: Awn7aGoZgv5RWeJvkVFJpC
     Trust anchor: Faber College (confirmed)
-    Verification key: ~CoEeFmQtaCRMrTy5SCfLLx
+    Verification key: ~W1mzX9ADpVc4T4sziaaRr
     Signing key: <hidden>
-    Target: FuN98eH2eZybECWkofW6A9BKJxxnTatBCopfUiNxo6ZB
-    Target Verification key: <same as target>
-    Target endpoint: 10.20.30.101:5555
-    Invitation nonce: b1134a647eb818069c089e7694f63e6d
-    Invitation status: Accepted
+    Remote: ULtgFQJe6bjiFbs7ke3NJD
+    Remote Verification key: ~5kh3FB4H3NKq7tUDqeqHc1
+    Remote endpoint: 10.0.0.6:5555
+    Request nonce: b1134a647eb818069c089e7694f63e6d
+    Request status: Accepted
     Available Claim(s): Transcript
-    Last synced: 14 seconds ago
+    Last synced: a minute ago
 
 Try Next:
     show claim "Transcript"
@@ -332,7 +331,7 @@ Try Next:
 
 Notice now that the Last synced line is updated.
 
-Alice can see now that the target verification key and target endpoint, as well as identifier and verification key are updated, which allows her to communicate with Faber College. She can also see that the identity of the trust anchor was confirmed (from the Sovrin network), and that her invitation has been accepted.
+Alice can see now that the remote verification key and remote endpoint, as well as DID and verification key are updated, which allows her to communicate with Faber College. She can also see that the identity of the trust anchor was confirmed (from the Sovrin network), and that her request has been accepted.
 
 ## Test Secure Interaction
 
@@ -342,8 +341,9 @@ At this point Alice is connected to Faber College and can interact in a secure w
 ALICE@test> ping Faber
 Expanding Faber to "Faber College"
 
-Pinging target endpoint: ('10.20.30.101', 5555)
+Pinging target endpoint: ('10.0.0.6', 5555)
     Ping sent.
+Pong received from %s
     Pong received.
 ```
 
@@ -365,9 +365,9 @@ She can trust the response from Faber College because (1) she connects to the cu
 
 ## Inspect the Claim
 
-Notice that when Alice last showed the Faber link, there was a new line: ```Available Claim(s): Transcript```. A **claim** is a piece of information about an identity -- a name, an age, a credit score… It is information claimed to be true. In this case, the claim is named, "Transcript".
+Notice that when Alice last showed the Faber connection, there was a new line: ```Available Claim(s): Transcript```. A **claim** is a piece of information about an identity -- a name, an age, a credit score… It is information claimed to be true. In this case, the claim is named, "Transcript".
 
-Claims are offered by an **issuer**. An issuer may be any identity owner known to Sovrin and any issuer may issue a claim about any identity owner it can identify. The usefulness and reliability of a claim are tied to the reputation of the issuer with respect to the claim at hand. For Alice to self-issue a claim that she likes chocolate ice cream may be perfectly reasonable, but for her to self-issue a claim that she graduated from Faber College should not impress anyone. The value of this transcript is that it is provably issued by Faber College. Alice wants to use that claim. She asks for more information:
+Claims are offered by an **issuer**. An issuer may be any identity owner known to Sovrin and any issuer may issue a claim about any identity owner it can identify. The usefulness and reliability of a claim are tied to the reputation of the issuer with respect to the claim at hand. For Alice to self-issue a claim that she likes chocolate ice cream may be perfectly reasonable, but for her to self-issue a claim that she graduated from Faber College should not impress anyone. The value of this transcript is that it is probably issued by Faber College. Alice wants to use that claim. She asks for more information:
 
 ```
 ALICE@test> show claim Transcript
@@ -389,23 +389,22 @@ Try Next:
 Alice sees the attributes the transcript contains. These attributes are known because a schema for Transcript has been written to the ledger (see [Appendix](#appendix)). However, the "not yet issued" note means that the transcript has not been delivered to Alice in a usable form. To get the transcript, Alice needs to request it.
 
 ```
-ALICE@test> request claim Transcript
-Found claim Transcript in link Faber College
+ALICE@test> request claim "Transcript"
+Found claim Transcript in connection Faber College
 Requesting claim Transcript from Faber College...
 
 Signature accepted.
 
-Response from Faber College (34.61 ms):
+Response from Faber College (11.79 ms):
     Received claim "Transcript".
-
 ```
 
 Now the transcript has been issued; Alice has it in her possession, in much the same way that she would hold a physical transcript that had been mailed to her. When she inspects it again, she sees more details:
 
 ```
 ALICE@test> show claim Transcript
-Found claim Transcript in link Faber College
-Status: 2017-05-01 12:32:17.497455
+Found claim Transcript in connection Faber College
+Status: 2017-08-24 20:12:22.448274
 Name: Transcript
 Version: 1.2
 Attributes:
@@ -418,12 +417,12 @@ Attributes:
 
 ## Apply for a Job
 
-At some time in the future, Alice would like to work for Acme Corp. Normally she would browse to their website, where she would click on a hyperlink to apply for a job. Her browser would download a link invitation which her Sovrin app would open; this would trigger a prompt to Alice, asking her to accept the link with Acme Corp. Because we’re using a CLI, the interface is different, but the steps are the same. We do approximately the same things that we did when Alice was accepting Faber College’s link invitation:
+At some time in the future, Alice would like to work for Acme Corp. Normally she would browse to their website, where she would click on a hyperlink to apply for a job. Her browser would download a connection request which her Sovrin app would open; this would trigger a prompt to Alice, asking her to accept the connection with Acme Corp. Because we’re using a CLI, the interface is different, but the steps are the same. We do approximately the same things that we did when Alice was accepting Faber College’s connection request:
 
 ```
 ALICE@test> show sample/acme-job-application.sovrin
 {
-  "link-invitation": {
+  "connection-request": {
     "name": "Acme Corp",
     "identifier": "CzkavE58zgX7rUMrzSinLr",
     "nonce": "57fbf9dc8c8e6acde33de98c6d747b28c",
@@ -449,67 +448,65 @@ Try Next:
     load sample/acme-job-application.sovrin
 ```
 
-Notice that this link invitation contains a **proof request**. A proof request is a request made by the party who needs verifiable proof of certain attributes  that can be provided by other verified claims. (Some attributes can be marked so that they must be verified by other proven claims -- like a SSN -- and some attributes can be self-attested to -- like a nickname.)
+Notice that this connection request contains a **proof request**. A proof request is a request made by the party who needs verifiable proof of certain attributes that can be provided by other verified claims. (Some attributes can be marked so that they must be verified by other proven claims -- like a SSN -- and some attributes can be self-attested to -- like a nickname.)
 
 In this case, Acme Corp is requesting that Alice provide a Job Application. The Job Application is a rich document type that has a schema defined on the Sovrin ledger; its particulars are outside the scope of this guide, but it will require a name, SSN, and degree, so it overlaps with the transcript we’ve already looked at. This becomes important below.
 
-Notice that the invitation also identifies an endpoint. This is different from our previous case, where an identity owner’s endpoint was discovered through lookup on the Sovrin ledger. Here, Acme has decided to short-circuit Sovrin and just directly publish its job application acceptor endpoint with each request. Sovrin supports this.  Alice quickly works through the sequence of commands that establishes a new pairwise connection with Acme:
+Notice that the request also identifies an endpoint. This is different from our previous case, where an identity owner’s endpoint was discovered through lookup on the Sovrin ledger. Here, Acme has decided to short-circuit Sovrin and just directly publish its job application acceptor endpoint with each request. Sovrin supports this.  Alice quickly works through the sequence of commands that establishes a new pairwise connection with Acme:
 ```
 ALICE@test> load sample/acme-job-application.sovrin
-1 link invitation found for Acme Corp.
-Creating Link for Acme Corp.
+1 connection request found for Acme Corp.
+Creating connection for Acme Corp.
 
 Try Next:
-    show link "Acme Corp"
-    accept invitation from "Acme Corp"
+    show connection "Acme Corp"
+    accept request from "Acme Corp"
 
 
-ALICE@test> show link Acme
-Expanding Acme to "Acme Corp"
-Link (not yet accepted)
+ALICE@test> show connection "Acme Corp"
+Connection (not yet accepted)
     Name: Acme Corp
-    Identifier: not yet assigned
+    DID: not yet assigned
     Trust anchor: Acme Corp (not yet written to Sovrin)
     Verification key: <empty>
     Signing key: <hidden>
-    Target: CzkavE58zgX7rUMrzSinLr
-    Target Verification key: <unknown, waiting for sync>
-    Target endpoint: 127.0.0.1:1213
-    Invitation nonce: 57fbf9dc8c8e6acde33de98c6d747b28c
-    Invitation status: not verified, target verkey unknown
+    Remote: CzkavE58zgX7rUMrzSinLr
+    Remote Verification key: <unknown, waiting for sync>
+    Remote endpoint: 127.0.0.1:1213
+    Request nonce: 57fbf9dc8c8e6acde33de98c6d747b28c
+    Request status: not verified, remote verkey unknown
     Proof Request(s): Job-Application
-    Last synced: <this link has not yet been synchronized>
+    Last synced: <this connection has not yet been synchronized>
 
 Try Next:
     sync "Acme Corp"
-    accept invitation from "Acme Corp"
+    accept request from "Acme Corp"
 
 
-ALICE@test> accept invitation from Acme
-Expanding Acme to "Acme Corp"
-Invitation not yet verified.
-Link not yet synchronized.
+ALICE@test> accept request from "Acme Corp"
+Request not yet verified.
+Connection not yet synchronized.
 Attempting to sync...
 
 Synchronizing...
-    Link Acme Corp synced
-Accepting invitation with nonce 57fbf9dc8c8e6acde33de98c6d747b28c from id 4rAx2tWErJXEfu7usUNQes
-SGdY53 looking for Acme Corp at 10.20.30.102:5555
-SGdY53 pinged Acme Corp at HA(host='0.0.0.0', port=6001)
-SGdY53 got pong from Acme Corp
+    Connection Acme Corp synced
+    Connection Acme Corp synced
+Accepting request with nonce 57fbf9dc8c8e6acde33de98c6d747b28c from id CzkavE58zgX7rUMrzSinLr
+CONNECTION: 1cbbe1 looking for Acme Corp at 10.0.0.6:6666
 
 Signature accepted.
 
-Response from Acme Corp (14.81 ms):
+Response from Acme Corp (2.25 ms):
     Trust established.
-    Identifier created in Sovrin.
+    DID created in Sovrin.
 
 Synchronizing...
-    Confirmed identifier written to Sovrin.
+    Confirmed DID written to Sovrin.
 
 Try Next:
     show proof request "Job-Application"
     send proof "Job-Application" to "Acme Corp"
+
 ```
 
 Notice what the proof request looks like now. Although the application is not submitted, it has various claims filled in:
@@ -559,15 +556,15 @@ ALICE@test> set phone_number to 123-456-7890
 Alice checks to see what the proof request looks like now.
 
 ```
-ALICE@test> show proof request Job-Application
-Found proof request "Job-Application" in link "Acme Corp"
+ALICE@test> show proof request "Job-Application"
+Found proof request "Job-Application" in connection "Acme Corp"
 Status: Requested
 Name: Job-Application
 Version: 0.2
 Attributes:
-    first_name: Alice
-    last_name: Garcia
-    phone_number: 123-456-7890
+    first_name: string
+    last_name: string
+    phone_number: string
     degree (V): Bachelor of Science, Marketing
     status (V): graduated
     ssn (V): 123-45-6789
@@ -586,43 +583,45 @@ The Proof is constructed from the following claims:
 Try Next:
     set <attr-name> to <attr-value>
     send proof "Job-Application" to "Acme Corp"
-```
-
-She decides to submit.
 
 ```
-ALICE@test> send proof Job-Application to Acme
+
+Alice decides to submit.
+
+```
+ALICE@test> send proof "Job-Application" to "Acme Corp"
 
 Signature accepted.
 
-Response from Acme Corp (15.98 ms):
+Response from Acme Corp (5.16 ms):
     Your Proof Job-Application 0.2 was received and verified
 
-Response from Acme Corp (23.95 ms):
+
+Response from Acme Corp (5.64 ms):
     Available Claim(s): Job-Certificate
 ```
 
 It will be interesting to see whether Acme accepts this application with the informal first_name not matching the one on her transcript. If Acme is concerned about this discrepancy, it could reach out to Alice and ask about it, using the secure channel that’s now established. Alice could send a photo showing her college ID that lists her name as "Alice (Sally) Gonzales".
 
-Here, we’ll assume the application is accepted, and Alice ends up getting the job. When Alice inspects her link with Acme a week later, she sees that a new claim is available:
+Here, we’ll assume the application is accepted, and Alice ends up getting the job. When Alice inspects her connectionAcme with Acme a week later, she sees that a new claim is available:
 
 ```
-ALICE@test> show link Acme
+ALICE@test> show connection Acme
 Expanding Acme to "Acme Corp"
-Link
+Connection
     Name: Acme Corp
-    Identifier: QANW5P3tjRX8Q8w8iyN9A5
+    DID: JaBWfh4Uxp1dpVNWJHoJSc
     Trust anchor: Acme Corp (confirmed)
-    Verification key: ~KdJUJwAq6Wj8To8pJgGHqE
+    Verification key: ~Th9K7sg6KPjpyfLU3KgTMh
     Signing key: <hidden>
-    Target: CzkavE58zgX7rUMrzSinLr
-    Target Verification key: <same as target>
-    Target endpoint: 10.20.30.102:6666
-    Invitation nonce: 57fbf9dc8c8e6acde33de98c6d747b28c
-    Invitation status: Accepted
+    Remote: CzkavE58zgX7rUMrzSinLr
+    Remote Verification key: ~WjXEvZ9xj4Tz9sLtzf7HVP
+    Remote endpoint: 10.0.0.6:6666
+    Request nonce: 57fbf9dc8c8e6acde33de98c6d747b28c
+    Request status: Accepted
     Proof Request(s): Job-Application
     Available Claim(s): Job-Certificate
-    Last synced: 11 minutes ago
+    Last synced: 4 minutes ago
 
 Try Next:
     show claim "Job-Certificate"
@@ -636,15 +635,16 @@ Try Next:
 Now that Alice has a job, she’d like to apply for a loan. That will require proof of employment. She can get this from the Job-Certificate claim offered by Acme. Alice goes through a familiar sequence of interactions. First she inspects the claim:
 
 ```
-ALICE@test> show claim Job-Certificate
-Found claim Job-Certificate in link Acme Corp.
-Status: available(not yet issued)
+ALICE@test> show claim "Job-Certificate"
+
+Found claim Job-Certificate in connection Acme Corp
+Status: available (not yet issued)
 Name: Job-Certificate
 Version: 0.2
 Attributes:
     first_name
     last_name
-    employement_status
+    employee_status
     experience
     salary_bracket
 
@@ -655,22 +655,22 @@ Try Next:
 Next, she requests it:
 
 ```
-ALICE@test> request claim Job-Certificate
-Found claim Job-Certificate in link Acme Corp
+ALICE@test> request claim "Job-Certificate"
+Found claim Job-Certificate in connection Acme Corp
 Requesting claim Job-Certificate from Acme Corp...
 
 Signature accepted.
 
-Response from Acme Corp (11.48 ms):
+Response from Acme Corp (10.57 ms):
     Received claim "Job-Certificate".
 ```
 
 The Job-Certificate has been issued, and she now has it in her possession.
 
 ```
-ALICE@test> show claim Job-Certificate
-Found claim Job-Certificate in link Acme Corp
-Status: 2017-05-01 16:53:53.742695
+ALICE@test> show claim "Job-Certificate"
+Found claim Job-Certificate in connection Acme Corp
+Status: 2017-08-24 20:33:55.856842
 Name: Job-Certificate
 Version: 0.2
 Attributes:
@@ -688,38 +688,36 @@ There is a disadvantage in this approach to data sharing though, -- it may discl
 Alice now loads Thrift Bank's loan application link:
 ```
 ALICE@test> load sample/thrift-loan-application.sovrin
-1 link invitation found for Thrift Bank.
-Creating Link for Thrift Bank.
+1 connection request found for Thrift Bank.
+Creating connection for Thrift Bank.
 
 Try Next:
-    show link "Thrift Bank"
-    accept invitation from "Thrift Bank"
+    show connection "Thrift Bank"
+    accept request from "Thrift Bank"
 ```
 
-Alice accepts the loan application link:
+Alice accepts the loan application connection:
 
 ```
-ALICE@test> accept invitation from Thrift
-Expanding thrift to "Thrift Bank"
-Invitation not yet verified.
-Link not yet synchronized.
+ALICE@test> accept request from "Thrift Bank"
+Request not yet verified.
+Connection not yet synchronized.
 Attempting to sync...
 
 Synchronizing...
-    Link Thrift Bank synced
-Accepting invitation with nonce 77fbf9dc8c8e6acde33de98c6d747b28c from id NyvGP1B1RQ14wyUHAbVdNh
-nLkB5S looking for Thrift Bank at 10.20.30.103:7777
-nLkB5S pinged Thrift Bank at HA(host='0.0.0.0', port=6002)
-nLkB5S got pong from Thrift Bank
+    Connection Thrift Bank synced
+    Connection Thrift Bank synced
+Accepting request with nonce 77fbf9dc8c8e6acde33de98c6d747b28c from id H2aKRiDeq8aLZSydQMDbtf
+CONNECTION: 1cbbe1 looking for Thrift Bank at 10.0.0.6:7777
 
 Signature accepted.
 
-Response from Thrift Bank (1.59 ms):
+Response from Thrift Bank (19.28 ms):
     Trust established.
-    Identifier created in Sovrin.
+    DID created in Sovrin.
 
 Synchronizing...
-    Confirmed identifier written to Sovrin.
+    Confirmed DID written to Sovrin.
 
 Try Next:
     show proof request "Loan-Application-Basic"
@@ -731,6 +729,7 @@ Try Next:
 ```
 
 Alice checks to see what the proof request "Loan-Application-Basic" looks like:
+
 ```
 ALICE@test> show proof request Loan-Application-Basic
 Found proof request "Loan-Application-Basic" in link "Thrift Bank"
@@ -758,14 +757,14 @@ Try Next:
 Alice sends just the "Loan-Application-Basic" proof to the bank. This allows her to minimize the **PII** (personally identifiable information) that she has to share when all she's trying to do right now is prove basic eligibility.
 
 ```
-ALICE@test> send proof Loan-Application-Basic to Thrift Bank
+ALICE@test> send proof "Loan-Application-Basic" to "Thrift Bank"
 
 Signature accepted.
 
-Response from Thrift Bank (479.17 ms):
-    Your Proof Loan-Application-Basic 0.1 has been received and verified
+Response from Thrift Bank (13.1 ms):
+    Your Proof Loan-Application-Basic 0.1 was received and verified
 
-    Loan eligibility criteria satisfied, please send another proof 'Loan-Application-KYC'
+    Loan eligibility criteria satisfied, please send another claim 'Loan-Application-KYC'
 ```
 
 Alice now checks the second proof request where she needs to share her personal information with the bank.
